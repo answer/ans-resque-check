@@ -22,19 +22,19 @@ Or install it yourself as:
 
     # config/initializers/ans-resque-check.rb
     Ans::Resque::Check.configure do |config|
-      config.on_notice do |e|
+      config.on_notice << lambda{|e|
         # エラー通知等
         #ExceptionNotifier::Notifier.exception_notification(request.env, e).deliver
-      end
+      }
     end
 
     # config/route.rb
     Application.routes.draw do
-      mount Ans::Resque::Check
+      mount Ans::Resque::Check::Engine => "/ans-resque-check"
     end
 
     # crontab
-    0 * * * * curl http://host.domain/ans-resque-check/checker > /dev/null 2>&1
+    0 * * * * curl http://host.domain/ans-resque-check > /dev/null 2>&1
 
 `Ans::Resque::Check.configure` で、通知時に呼び出されるコールバックを設定  
 コントローラーのコンテキストから呼び出される  
@@ -44,6 +44,9 @@ get アクセスを受け付けるルーティングが作成され、検出し�
 
     queue1:10,queue2:20,failed:30
 
+このアクションに、一時間に一回アクセスしてチェックを行う  
+失敗があると、常に通知が来るので、一時間に一回のチェックくらいがちょうどいいのでは
+
 ## 設定可能な設定とデフォルト
 
     # config/initializers/ans-resque-check.rb
@@ -51,12 +54,12 @@ get アクセスを受け付けるルーティングが作成され、検出し�
       config.queue_notice_threshold = 500 # 通常のキューにこれだけたまったら通知
       config.failed_notice_threshold = 0 # 失敗のキューにこれだけたまったら通知
 
-      config.on_notice do |e|
+      config.on_notice << lambda{|e|
         # デフォルトは設定されていない
-      end
-      config.on_notice do |e|
+      }
+      config.on_notice << lambda{|e|
         # 複数回設定すると、最初に設定したブロックから順に全て呼び出される
-      end
+      }
     end
 
 ## Contributing
