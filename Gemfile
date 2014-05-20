@@ -1,4 +1,6 @@
 source 'https://rubygems.org'
+source 'http://gem.ans-web.co.jp/public'
 
-# Specify your gem's dependencies in ans-resque-check.gemspec
 gemspec
+
+gem "ans-releaser"
